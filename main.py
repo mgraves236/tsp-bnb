@@ -1,11 +1,13 @@
 # Travelling Salesman Problem
 # Branch and Bound
 import array
+import numpy
+import math
 from sys import maxsize
 
 import RandomNumberGenerator
 
-random = RandomNumberGenerator.RandomNumberGenerator(5954)
+random = RandomNumberGenerator.RandomNumberGenerator(5546568)
 
 
 # function to generate adjacent matrix for the graph
@@ -14,64 +16,45 @@ def generate_graph(size: int):
     for i in range(0, size):
         for j in range(0, size):
             if [i] == [j]:
-                matrix[i][j] = 0
+                matrix[i][j] = maxsize
             else:
                 matrix[i][j] = random.nextInt(1, 30)
     return matrix
 
 
-def least_cost_edges(matrix: array, i : int):
-    # node # least cost edges # total cost
-    least_cost = {'min1': maxsize, 'min2': maxsize}
-    # find first minimum
-    for j in range(0, size):
-        if i == j:
-            continue
-        elif matrix[i][j] < least_cost['min1'] and i != j:
-            least_cost['min1'] = matrix[i][j]
-        elif least_cost['min2'] > matrix[i][j] != least_cost['min1'] and i != j:
-            least_cost['min2'] = matrix[i][j]
-    return least_cost
+def greedy(adj: array, start: int):
+    # Nearest Neighbour Algorithm
+    min_tour = 0
+    path = [0]
+    visited = [False] * size
+    visited[0] = True
+    current_node = 0
 
+    index = -1
+    for i in range(0, size - 1):
+        min_row = maxsize
+        for j in range(0, size):
+            if current_node == j: continue
+            if adj[current_node][j] < min_row and visited[j] == False:
+                min_row = adj[current_node][j]
+                index = j
+        current_node = index
+        visited[current_node] = True
+        path.append(current_node)
+        min_tour += min_row
 
-# lower bound calculated as >= sum_(v in V) (sum of the cost of the two
-# least cost edges adjacent to v)
+    # back to the 0th node
+    last_index = path[-1]
+    min_tour += adj[last_index][0]
+    path.append(path[0])
 
-def lower_bound(adj : array, i: int, j: int, level: int):
-    least_i = least_cost_edges(adj, i)
-    least_j = least_cost_edges(adj, j)
-
-    if level == 1:
-        return (least_i['min1'] + least_j['min1']) * 1/2 + adj[i][j]
-
-    if level > 1:
-        return (least_i['min2'] + least_j['min1']) * 1/2 + adj[i][j]
-
+    return {'value': min_tour,
+            'path': path}
 
 def tsp(adj: array):
-    # tour always starts at node 0
-    curr_lower_bound = 0
-    upper_bound = maxsize
-    visited = [False] * size
-    curr_path = []
-    level = 0 # keep track of depth of the tree
-
-    least = []
-    sum = 0
     # always start from node 0
-    for i in range(0, size):
-        least = least_cost_edges(adj, i)
-        print(least['min1'] + least['min2'])
-        sum += least['min1'] + least['min2']
-    sum = sum / 2
-    curr_lower_bound = sum
-    visited[0] = True
-    curr_path.append(0)
-    # lower_bound(adj, 0, 1, 1)
-
-    if level == size:
-        return
-
+    upperbound = greedy(adj, 0)
+    print(upperbound)
 
 
 if __name__ == "__main__":
