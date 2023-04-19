@@ -4,7 +4,6 @@ import array
 import numpy
 import math
 from sys import maxsize
-
 import numpy as np
 
 import RandomNumberGenerator
@@ -68,7 +67,6 @@ def union(i: int, j: int, parent: array):
 
 def kruskal(matrix: array, size: int):
     mincost = 0;
-    print(matrix)
 
     parent = [i for i in range(size)]
 
@@ -101,15 +99,18 @@ def least_cost_edges(matrix: array, i: int):
     return least_cost
 
 
+def reeduce(matrix: array, index: int):
+    reduced = np.delete(matrix, index, 0)
+    reduced = reduced.tolist()
+    reduced = np.delete(reduced, index, 1)
+    reduced = reduced.tolist()
+    return reduced
 
 def lowerbound(matrix: array, node: int, size: int):
     # Kruskal's Algorithm
     # Delete a vertex then find a minimum spanning tree
 
-    reduced = np.delete(matrix, node, 0)
-    reduced = reduced.tolist()
-    reduced = np.delete(reduced, node, 1)
-    reduced = reduced.tolist()
+    reduced = reeduce(matrix, node)
 
     # sort edges from min to max
     least_edges = least_cost_edges(matrix, node)
@@ -123,14 +124,10 @@ def tsp(adj: array):
     upperbound = greedy(adj, 0)
     upperbound = upperbound['value']
 
-    curr_lower_bound = 0
-    level = 0
-    curr_path = [-1] * (size +1)
-    visited = [False]
+    queue = [[0 for x in range(size)] for y in range(1)]
 
-    # Always start from node 0
-    visited[0] = True
-    curr_path[0] = 0
+    for i in range(0, size):
+        print(lowerbound(adj, i, size))
 
 
 
