@@ -54,22 +54,73 @@ def greedy(matrix: array, start: int):
             'path': path}
 
 
+def find(i: int, parent: array):
+    while parent[i] != i:
+        i = parent[i]
+    return i
+
+def union(i: int, j: int, parent: array):
+    a = find(i, parent)
+    b = find(j, parent)
+    parent[a] = b
+
+def kruskal(matrix: array, size: int):
+    mincost = 0;
+    print(matrix)
+
+    parent = [i for i in range(size)]
+
+    for i in range(0, size - 2):
+        min = maxsize
+        a = -1
+        b = -1
+        for j in range(0, size - 1):
+            for k in range(0, size - 1):
+                if find(j, parent) != find(k, parent) and matrix[j][k] < min:
+                    min = matrix[j][k]
+                    a = j
+                    b = k
+        union(a, b, parent)
+        mincost += min
+    return mincost
+
+
+def least_cost_edges(matrix: array, i : int):
+    # node # least cost edges # total cost
+    least_cost = {'min1': maxsize, 'min2': maxsize}
+    # find first minimum
+    for j in range(0, size):
+        if i == j:
+            continue
+        elif matrix[i][j] < least_cost['min1'] and i != j:
+            least_cost['min1'] = matrix[i][j]
+        elif least_cost['min2'] > matrix[i][j] != least_cost['min1'] and i != j:
+            least_cost['min2'] = matrix[i][j]
+    return least_cost
+
+
 def lowerbound(matrix: array, node: int, size: int):
     # Kruskal's Algorithm
     # Delete a vertex then find a minimum spanning tree
 
     reduced = np.delete(matrix, node, 0)
     reduced = reduced.tolist()
-    reduced = np.delete(matrix, node, 1)
+    reduced = np.delete(reduced, node, 1)
     reduced = reduced.tolist()
+
+    # sort edges from min to max
+    least_edges = least_cost_edges(matrix, node)
+    lb = kruskal(reduced, size) + least_edges['min1'] + least_edges['min2']
+
+    return lb
+
 
 def tsp(adj: array):
     # Always start from node 0
     # set upper bound -- initial best tour cost
     upperbound = greedy(adj, 0)
     upperbound = upperbound['value']
-    print(upperbound)
-    lowerbound(adj, 0, size)
+    print(lowerbound(adj, 0, size))
 
 
 if __name__ == "__main__":
@@ -78,5 +129,5 @@ if __name__ == "__main__":
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
     mat = generate_graph(size)
 
-    print(mat)
+    # print(mat)
     tsp(mat)
