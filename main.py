@@ -99,7 +99,7 @@ def least_cost_edges(matrix: array, i: int):
     return least_cost
 
 
-def reeduce(matrix: array, index: int):
+def reduce(matrix: array, index: int):
     reduced = np.delete(matrix, index, 0)
     reduced = reduced.tolist()
     reduced = np.delete(reduced, index, 1)
@@ -110,7 +110,7 @@ def lowerbound(matrix: array, node: int, size: int):
     # Kruskal's Algorithm
     # Delete a vertex then find a minimum spanning tree
 
-    reduced = reeduce(matrix, node)
+    reduced = reduce(matrix, node)
 
     # sort edges from min to max
     least_edges = least_cost_edges(matrix, node)
