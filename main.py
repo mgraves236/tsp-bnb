@@ -59,10 +59,12 @@ def find(i: int, parent: array):
         i = parent[i]
     return i
 
+
 def union(i: int, j: int, parent: array):
     a = find(i, parent)
     b = find(j, parent)
     parent[a] = b
+
 
 def kruskal(matrix: array, size: int):
     mincost = 0;
@@ -85,7 +87,7 @@ def kruskal(matrix: array, size: int):
     return mincost
 
 
-def least_cost_edges(matrix: array, i : int):
+def least_cost_edges(matrix: array, i: int):
     # node # least cost edges # total cost
     least_cost = {'min1': maxsize, 'min2': maxsize}
     # find first minimum
@@ -97,6 +99,7 @@ def least_cost_edges(matrix: array, i : int):
         elif least_cost['min2'] > matrix[i][j] != least_cost['min1'] and i != j:
             least_cost['min2'] = matrix[i][j]
     return least_cost
+
 
 
 def lowerbound(matrix: array, node: int, size: int):
@@ -116,11 +119,23 @@ def lowerbound(matrix: array, node: int, size: int):
 
 
 def tsp(adj: array):
-    # Always start from node 0
-    # set upper bound -- initial best tour cost
+    # Set upper bound -- initial best tour cost
     upperbound = greedy(adj, 0)
     upperbound = upperbound['value']
-    print(lowerbound(adj, 0, size))
+
+    curr_lower_bound = 0
+    level = 0
+    curr_path = [-1] * (size +1)
+    visited = [False]
+
+    # Always start from node 0
+    visited[0] = True
+    curr_path[0] = 0
+
+
+
+
+
 
 
 if __name__ == "__main__":
