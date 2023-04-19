@@ -112,7 +112,6 @@ def lowerbound(matrix: array, node: int, size: int):
 
     reduced = reduce(matrix, node)
 
-    # sort edges from min to max
     least_edges = least_cost_edges(matrix, node)
     lb = kruskal(reduced, size) + least_edges['min1'] + least_edges['min2']
 
