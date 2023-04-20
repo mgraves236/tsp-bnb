@@ -53,45 +53,71 @@ def greedy(matrix: array, start: int):
             'path': path}
 
 
-
 def lowerbound(matrix: array, i: int, j:int, arr_min: array, visited: array):
     lb = matrix[i][j]
-    print(lb)
+    visited[0] = False
+    visited[j] = True
+    # print(visited)
+    # print(visited)
+    # print(lb)
     sum = 0
     for i in range(0, size):
         if not visited[i]:
             sum += arr_min[i]
-            print(arr_min[i])
+            # print(arr_min[i])
+    visited[0] = True
+    visited[j] = False
+
     return sum + lb
+
 
 def tsp(adj: array, size: int):
     # Set upper bound -- initial best tour cost
     upperbound = greedy(adj, 0)
     upperbound = upperbound['value']
-    print(adj)
     # Find min of each column
     arr_min = np.min(adj, axis=0)
     arr_min = arr_min.tolist()
-    print(arr_min)
 
     # Iterative DFS
+    # visited = [False] * size
+    # stack.append(0)
+    # stack.append(1)
+    # visited[1] = True
+    # lb = lowerbound(adj, 0, 1, arr_min, visited)
+    # for i in range(1, 2):
     stack = []
+    lb = []
     visited = [False] * size
     stack.append(0)
-    stack.append(1)
-    visited[1] = True
-    lb = lowerbound(adj, 0, 1, arr_min, visited)
-    print(lb)
-    # for i in range(0, size):
-    #     stack = []
-    #     visited = [False] * size
-    #     stack.append(0)
-    #     visited[0] = True
-    #     stack.append(i)
-    #     while len(stack) > 0:
-    #         v = stack.pop()
-    #         if not visited[v]:
-    #             visited[v] = True
+    sum = 0
+    weight = []
+    while len(stack) > 0:
+        lb = []
+        print(stack)
+        v = stack.pop()
+        if not visited[v]:
+            visited[v] = True
+            print(visited)
+            for j in range(0, size):
+                if not visited[j]:
+                    print(v)
+                    print(j)
+                    print(visited)
+                    lb = lowerbound(adj, v, j, arr_min, visited)
+                    for k in range(0,len(weight)):
+                        lb += weight[k]
+
+                    weight.append(adj[v][j])
+                    print("w ", weight)
+                    if lb > upperbound:
+                        print(str(j) + ' removed')
+
+                    else:
+                        stack.append(j)
+
+
+
 
 
 
