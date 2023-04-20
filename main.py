@@ -67,22 +67,25 @@ def union(i: int, j: int, parent: array):
 
 def kruskal(matrix: array, size: int):
     mincost = 0;
-
+    path = []
     parent = [i for i in range(size)]
-
-    for i in range(0, size - 2):
+    # no of edges is size, but we start from 0
+    for i in range(0, size-1):
         min = maxsize
         a = -1
         b = -1
-        for j in range(0, size - 1):
-            for k in range(0, size - 1):
+        for j in range(0, size):
+            for k in range(0, size):
                 if find(j, parent) != find(k, parent) and matrix[j][k] < min:
                     min = matrix[j][k]
                     a = j
                     b = k
         union(a, b, parent)
+        path.append(a)
+        path.append(b)
         mincost += min
-    return mincost
+    return {'mincost': mincost,
+            'path': path}
 
 
 def least_cost_edges(matrix: array, i: int):
@@ -106,6 +109,7 @@ def reduce(matrix: array, index: int):
     reduced = reduced.tolist()
     return reduced
 
+
 def lowerbound(matrix: array, node: int, size: int):
     # Kruskal's Algorithm
     # Delete a vertex then find a minimum spanning tree
@@ -113,7 +117,8 @@ def lowerbound(matrix: array, node: int, size: int):
     reduced = reduce(matrix, node)
 
     least_edges = least_cost_edges(matrix, node)
-    lb = kruskal(reduced, size) + least_edges['min1'] + least_edges['min2']
+    lb = kruskal(reduced, size-1)
+    lb = lb['mincost'] + least_edges['min1'] + least_edges['min2']
 
     return lb
 
@@ -139,6 +144,13 @@ if __name__ == "__main__":
     # starting point is indicated by rows and destination by cols
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
     mat = generate_graph(size)
-
+    mat2 = [[maxsize, 7, 8, maxsize, maxsize, maxsize],
+            [7, maxsize, 3, 6, maxsize, 5],
+            [8, 3, maxsize, 4, maxsize, 3],
+            [maxsize, 6, 4, maxsize, 5, 2],
+            [maxsize, maxsize, maxsize, 5, maxsize, 2],
+            [maxsize, 5, 3, 2, 2, maxsize]]
+    k = kruskal(mat2, 6)
+    print(k)
     # print(mat)
     tsp(mat)
