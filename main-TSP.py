@@ -57,14 +57,10 @@ def lowerbound(matrix: array, i: int, j:int, arr_min: array, visited: array):
     lb = matrix[i][j]
     visited[0] = False
     visited[j] = True
-    # print(visited)
-    # print(visited)
-    # print(lb)
     sum = 0
     for i in range(0, size):
         if not visited[i]:
             sum += arr_min[i]
-            print(arr_min[i])
     visited[0] = True
     visited[j] = False
 
@@ -89,7 +85,6 @@ def tsp(adj: array, size: int):
     path = []
     cost = 0
     while len(stack) > 0:
-        print(stack)
         # flag indicates if this vertex is reached from 0
         (v, flag) = stack.pop()
         if flag:
@@ -131,28 +126,15 @@ def tsp(adj: array, size: int):
             'path': path}
 
 
-
-
-
-
-
-
 if __name__ == "__main__":
     size = 4  # number of graph vertices
     # Starting point is indicated by rows and destination by cols
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
     mat = generate_graph(size)
-    # mat2 = [[maxsize, 7, 8, maxsize, maxsize, maxsize],
-    #         [7, maxsize, 3, 6, maxsize, 5],
-    #         [8, 3, maxsize, 4, maxsize, 3],
-    #         [maxsize, 6, 4, maxsize, 5, 2],
-    #         [maxsize, maxsize, maxsize, 5, maxsize, 2],
-    #         [maxsize, 5, 3, 2, 2, maxsize]]
-    # k = kruskal(mat2, 6)
-    # print(k)
-    # print(mat)
     tsp = tsp(mat, size)
     nn = greedy(mat, 0)
-    print('-----------------------------------')
-    print('\tTSP')
-    print('-----------------------------------')
+    print('-----------------------------------------------------------')
+    print('\t\t\t\tTSP')
+    print('-----------------------------------------------------------')
+    print('NEAREST NEIGHBOURS\t', nn)
+    print('B&B\t', tsp)
