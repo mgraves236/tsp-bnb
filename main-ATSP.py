@@ -65,10 +65,17 @@ def union(i: int, j: int, parent: array):
     parent[a] = b
 
 
-def kruskal(matrix: array, size: int):
-    mincost = 0;
+def kruskal(matrix: array, size: int, edges: array):
+    mincost = 0
     path = []
     parent = [i for i in range(size)]
+    # Check if there are any predefined edges
+    for i in range(0, size + 1):
+        for j in range(0, size + 1):
+            if edges[i][j] == True:
+                print(1)
+
+
     # No of edges is size, but we start from 0
     for i in range(0, size-1):
         min = maxsize
@@ -109,13 +116,15 @@ def reduce(matrix: array, index: int):
     return reduced
 
 
-def lowerbound(matrix: array, node: int, size: int):
+def lowerbound(matrix: array, node: int, size: int, edges: array):
     # Kruskal's Algorithm
     # Create two undirected graphs from one directed
     # Delete a vertex then find a minimum spanning tree
 
     upper = [[0 for x in range(size)] for y in range(size)]
     lower = [[0 for x in range(size)] for y in range(size)]
+    upper_edges = [[0 for x in range(size)] for y in range(size)]
+    lower_edges = [[0 for x in range(size)] for y in range(size)]
 
     for i in range(0, size):
         for j in range(0, size):
@@ -133,14 +142,16 @@ def lowerbound(matrix: array, node: int, size: int):
     # Find lower bound for upper
     reduced = reduce(upper, node)
     least_edges = least_cost_edges(upper, node)
-    lb_up = kruskal(reduced, size-1)
+    lb_up = kruskal(reduced, size - 1, edges)
     lb_up = lb_up['mincost'] + least_edges['min1'] + least_edges['min2']
+    # lb_up = lb_up['mincost'] + least_edges['min2']
 
     # Find lower bound for lower
     reduced = reduce(lower, node)
     least_edges = least_cost_edges(lower, node)
-    lb_low = kruskal(reduced, size - 1)
+    lb_low = kruskal(reduced, size - 1, edges)
     lb_low = lb_low['mincost'] + least_edges['min1'] + least_edges['min2']
+    # lb_low = lb_low['mincost'] + least_edges['min2']
 
     if lb_low > lb_up:
         return lb_up
@@ -152,20 +163,45 @@ def tsp(adj: array, size: int):
     # Set upper bound -- initial best tour cost
     upperbound = greedy(adj, 0)
     upperbound = upperbound['value']
+    print(upperbound)
+    def_edges = [[0 for x in range(size)] for y in range(size)]
+    for i in range(0, size):
+        for j in range(0, size):
+            def_edges[i][j] = False
+
 
     # Iterative DFS
-    stack = []
-    visited = [False] * size
 
-    print(lowerbound(adj, 0, size))
     # for i in range(0, size):
     #     print(lowerbound(adj, i, size))
+    matrix = [[0 for x in range(size)] for y in range(size)]
+
+    for i in range(0, size):
+        for j in range(0, size):
+            matrix[i][j] = adj[i][j]
+            matrix[i][j] = adj[i][j]
+    stack = []
+    visited = [False] * size
     stack.append(0)
     visited[0] = True
-    for i in range(1, size):
-        stack.append(i)
-        while len(stack) > 0:
-            v = stack.pop()
+    stack.append(1)
+    visited[1] = True
+    def_edges[0][1] = True
+    print(lowerbound(adj, 1, size, def_edges))
+
+
+
+    # for i in range(0, size):
+    #     stack = []
+    #     visited = [False] * size
+    #     stack.append(0)
+    #     visited[0] = True
+    #     stack.append(i)
+    #     while len(stack) > 0:
+    #         v = stack.pop()
+    #         if not visited[v]:
+    #             visited[v] = True
+
 
 
 
