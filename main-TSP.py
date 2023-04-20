@@ -36,7 +36,7 @@ def greedy(matrix: array, start: int):
         min_row = maxsize
         for j in range(0, size):
             if current_node == j: continue
-            if matrix[current_node][j] < min_row and visited[j] == False:
+            if matrix[current_node][j] < min_row and not visited[j]:
                 min_row = matrix[current_node][j]
                 index = j
         current_node = index
@@ -64,7 +64,7 @@ def lowerbound(matrix: array, i: int, j:int, arr_min: array, visited: array):
     for i in range(0, size):
         if not visited[i]:
             sum += arr_min[i]
-            # print(arr_min[i])
+            print(arr_min[i])
     visited[0] = True
     visited[j] = False
 
@@ -80,42 +80,55 @@ def tsp(adj: array, size: int):
     arr_min = arr_min.tolist()
 
     # Iterative DFS
-    # visited = [False] * size
-    # stack.append(0)
-    # stack.append(1)
-    # visited[1] = True
-    # lb = lowerbound(adj, 0, 1, arr_min, visited)
-    # for i in range(1, 2):
     stack = []
-    lb = []
+    prev = 0
     visited = [False] * size
-    stack.append(0)
-    sum = 0
+    stack.append((0, False))
+    lb = 0
     weight = []
+    path = []
+    cost = 0
     while len(stack) > 0:
-        lb = []
         print(stack)
-        v = stack.pop()
+        # flag indicates if this vertex is reached from 0
+        (v, flag) = stack.pop()
+        if flag:
+            visited[prev] = False
+            prev = 0
+            weight = []
+        if v != 0:
+            lb = lowerbound(adj, prev, v, arr_min, visited)
+            for k in range(0, len(weight)):
+                lb += weight[k][0]
+            weight.append((adj[prev][v], prev, v))
+        prev = v
         if not visited[v]:
             visited[v] = True
-            print(visited)
+            leaf = True
             for j in range(0, size):
                 if not visited[j]:
-                    print(v)
-                    print(j)
-                    print(visited)
-                    lb = lowerbound(adj, v, j, arr_min, visited)
-                    for k in range(0,len(weight)):
-                        lb += weight[k]
+                    leaf = False
 
-                    weight.append(adj[v][j])
-                    print("w ", weight)
-                    if lb > upperbound:
-                        print(str(j) + ' removed')
-
-                    else:
-                        stack.append(j)
-
+                    if lb <= upperbound:  # else reduce
+                        if v == 0:
+                            stack.append((j, True))  # reached from 0
+                        else:
+                            stack.append((j, False))
+            if leaf:
+                newLb = lb + adj[v][0]
+                if newLb < upperbound:
+                    upperbound = newLb
+                    path = [k for (i, j, k) in weight]
+                    path.insert(0, 0)
+                    path.append(0)
+                visited = [False] * size
+                visited[0] = True
+                tmp = weight[0]
+                prev = tmp[2]
+                visited[prev] = True
+                weight = [tmp]
+    return {'value': lb,
+            'path': path}
 
 
 
@@ -138,4 +151,8 @@ if __name__ == "__main__":
     # k = kruskal(mat2, 6)
     # print(k)
     # print(mat)
-    tsp(mat, size)
+    tsp = tsp(mat, size)
+    nn = greedy(mat, 0)
+    print('-----------------------------------')
+    print('\tTSP')
+    print('-----------------------------------')
