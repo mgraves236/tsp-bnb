@@ -69,7 +69,7 @@ def kruskal(matrix: array, size: int):
     mincost = 0;
     path = []
     parent = [i for i in range(size)]
-    # no of edges is size, but we start from 0
+    # No of edges is size, but we start from 0
     for i in range(0, size-1):
         min = maxsize
         a = -1
@@ -89,9 +89,8 @@ def kruskal(matrix: array, size: int):
 
 
 def least_cost_edges(matrix: array, i: int):
-    # node # least cost edges # total cost
     least_cost = {'min1': maxsize, 'min2': maxsize}
-    # find first minimum
+    # Find first minimum
     for j in range(0, size):
         if i == j:
             continue
@@ -112,28 +111,61 @@ def reduce(matrix: array, index: int):
 
 def lowerbound(matrix: array, node: int, size: int):
     # Kruskal's Algorithm
+    # Create two undirected graphs from one directed
     # Delete a vertex then find a minimum spanning tree
 
-    reduced = reduce(matrix, node)
+    upper = [[0 for x in range(size)] for y in range(size)]
+    lower = [[0 for x in range(size)] for y in range(size)]
 
-    least_edges = least_cost_edges(matrix, node)
-    lb = kruskal(reduced, size-1)
-    lb = lb['mincost'] + least_edges['min1'] + least_edges['min2']
+    for i in range(0, size):
+        for j in range(0, size):
+            upper[i][j] = matrix[i][j]
+            lower[i][j] = matrix[i][j]
+    # Upper half
+    for i in range(0, size):
+        for j in range(0, size):
+            upper[j][i] = matrix[i][j]
+    # Lower half
+    for i in range(0, size):
+        for j in range(0, size):
+            lower[i][j] = matrix[j][i]
 
-    return lb
+    # Find lower bound for upper
+    reduced = reduce(upper, node)
+    least_edges = least_cost_edges(upper, node)
+    lb_up = kruskal(reduced, size-1)
+    lb_up = lb_up['mincost'] + least_edges['min1'] + least_edges['min2']
+
+    # Find lower bound for lower
+    reduced = reduce(lower, node)
+    least_edges = least_cost_edges(lower, node)
+    lb_low = kruskal(reduced, size - 1)
+    lb_low = lb_low['mincost'] + least_edges['min1'] + least_edges['min2']
+
+    if lb_low > lb_up:
+        return lb_up
+    else:
+        return lb_low
 
 
-def tsp(adj: array):
+def tsp(adj: array, size: int):
     # Set upper bound -- initial best tour cost
     upperbound = greedy(adj, 0)
     upperbound = upperbound['value']
 
-    queue = [[0 for x in range(size)] for y in range(1)]
+    # Iterative DFS
+    stack = []
+    visited = [False] * size
 
-    for i in range(0, size):
-        print(lowerbound(adj, i, size))
-
-
+    print(lowerbound(adj, 0, size))
+    # for i in range(0, size):
+    #     print(lowerbound(adj, i, size))
+    stack.append(0)
+    visited[0] = True
+    for i in range(1, size):
+        stack.append(i)
+        while len(stack) > 0:
+            v = stack.pop()
 
 
 
@@ -141,16 +173,16 @@ def tsp(adj: array):
 
 if __name__ == "__main__":
     size = 4  # number of graph vertices
-    # starting point is indicated by rows and destination by cols
+    # Starting point is indicated by rows and destination by cols
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
     mat = generate_graph(size)
-    mat2 = [[maxsize, 7, 8, maxsize, maxsize, maxsize],
-            [7, maxsize, 3, 6, maxsize, 5],
-            [8, 3, maxsize, 4, maxsize, 3],
-            [maxsize, 6, 4, maxsize, 5, 2],
-            [maxsize, maxsize, maxsize, 5, maxsize, 2],
-            [maxsize, 5, 3, 2, 2, maxsize]]
-    k = kruskal(mat2, 6)
-    print(k)
+    # mat2 = [[maxsize, 7, 8, maxsize, maxsize, maxsize],
+    #         [7, maxsize, 3, 6, maxsize, 5],
+    #         [8, 3, maxsize, 4, maxsize, 3],
+    #         [maxsize, 6, 4, maxsize, 5, 2],
+    #         [maxsize, maxsize, maxsize, 5, maxsize, 2],
+    #         [maxsize, 5, 3, 2, 2, maxsize]]
+    # k = kruskal(mat2, 6)
+    # print(k)
     # print(mat)
-    tsp(mat)
+    tsp(mat, size)
