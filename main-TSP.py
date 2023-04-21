@@ -109,7 +109,7 @@ def kruskal(matrix: array, size: int, edges: array = []):
                     union(i, j, parent)
                     path.append(i)
                     path.append(j)
-                    mincost += matrix[i][j]
+                    #mincost += matrix[i][j]
     # assign unassigned edges
     for i in range(0, curr_size):
         min = maxsize
@@ -119,6 +119,7 @@ def kruskal(matrix: array, size: int, edges: array = []):
             for k in range(0, size):
                 if find(j, parent) != find(k, parent) and matrix[j][k] < min:
                     min = matrix[j][k]
+                    # print(min)
                     a = j
                     b = k
         union(a, b, parent)
@@ -131,14 +132,20 @@ def kruskal(matrix: array, size: int, edges: array = []):
 
 
 def least_cost_edges(matrix: array, i: int):
+    # print('least_cost', matrix)
     least_cost = {'min1': maxsize, 'min2': maxsize}
     for j in range(0, size):
         if i == j:
             continue
         elif matrix[i][j] < least_cost['min1'] and i != j:
             least_cost['min1'] = matrix[i][j]
+
+    for j in range(0, size):
+        if i == j:
+            continue
         elif least_cost['min2'] > matrix[i][j] != least_cost['min1'] and i != j:
             least_cost['min2'] = matrix[i][j]
+
     return least_cost
 
 
@@ -155,9 +162,13 @@ def reduce(matrix: array, index: int):
 def lowerbound_k(matrix: array, node: int, size: int, edges: array):
     # Delete a vertex then find a minimum spanning tree
     reduced = reduce(matrix, node)
-    least_edges = least_cost_edges(matrix, node)
     reduced_edges = reduce(edges, node)
+    # print(reduced)
+    # print(reduced_edges)
     lb = kruskal(reduced, size - 1, reduced_edges)
+    # print('kruskal', lb)
+    least_edges = least_cost_edges(matrix, node)
+    # print('least_edges', least_edges)
     lb = lb['mincost'] + least_edges['min1'] + least_edges['min2']
 
     return lb
@@ -179,6 +190,7 @@ def tsp(adj: array, size: int):
                 min_adj[i][j] = adj[j][i]
             else:
                 min_adj[i][j] = adj[i][j]
+    # print(min_adj)
 
     edges = [[False for x in range(size)] for y in range(size)]
 
@@ -212,9 +224,14 @@ def tsp(adj: array, size: int):
                 for (i, j, k) in weight:
                     visited[j] = True
                     visited[k] = True
-
+            # print('v', v)
+            # print('prev', prev)
+            edges[prev][v] = True
+            edges[v][prev] = True
+            # print(edges)
             if do_kruskal:
                 lb = lowerbound_k(min_adj, v, size, edges)
+                # print('lb', lb)
             else:
                 lb = lowerbound(adj, prev, v, arr_min, visited)
 
@@ -223,7 +240,7 @@ def tsp(adj: array, size: int):
                 lb += weight[k][0]
             weight.append((adj[prev][v], prev, v))
 
-        edges[prev][v] = True
+
         prev = v
         prev_level = l
         if lb > upperbound: # prune
@@ -234,11 +251,10 @@ def tsp(adj: array, size: int):
                 leaf = True
                 for j in range(0, size):
                     if not visited[j]:
+
                         leaf = False
-                        if lb <= upperbound:  # else prune
-                            stack.append((j, l + 1))
-                        else:
-                            do_erase = True
+                        stack.append((j, l + 1))
+
                 if leaf:
                     newLb = 0
                     # calculate real tour cost
@@ -260,24 +276,25 @@ def tsp(adj: array, size: int):
 do_kruskal = False
 
 if __name__ == "__main__":
-    size = 15  # number of graph vertices
+    size = 4  # number of graph vertices
     # starting point is indicated by rows and destination by cols
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
-    mat = generate_graph(size)
+    mat = generate_graph_sym(size)
+    print(mat)
     print('-----------------------------------------------------------')
     print('\t\t\t\t\tTSP')
     print('-----------------------------------------------------------')
     nn = greedy(mat, 0)
     print('NEAREST NEIGHBOURS\t', nn)
-    tsp_var = tsp(mat, size)
-    print('B&B\t', tsp_var)
-    # do_k = ''
-    # for i in range(0, 2):
-    #     tsp_var = tsp(mat, size)
-    #     if do_kruskal:
-    #         do_k = 'Kruskal'
-    #     print('B&B\t',do_k, tsp_var)
-    #     do_kruskal = True
+    # tsp_var = tsp(mat, size)
+    # print('B&B\t', tsp_var)
+    do_k = ''
+    for i in range(0, 2):
+        tsp_var = tsp(mat, size)
+        if do_kruskal:
+            do_k = 'Kruskal'
+        print('B&B\t',do_k, tsp_var)
+        do_kruskal = True
 
 
 
