@@ -293,7 +293,7 @@ if __name__ == "__main__":
         tsp_var = tsp(mat, size)
         if do_kruskal:
             do_k = 'Kruskal'
-        print('B&B\t',do_k, tsp_var)
+        print('B&B\t', do_k, tsp_var)
         do_kruskal = True
 
 
