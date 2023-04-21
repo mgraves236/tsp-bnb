@@ -1,7 +1,6 @@
 # Travelling Salesman Problem
 # Branch and Bound
 import array
-import math
 from sys import maxsize
 import numpy as np
 
@@ -172,8 +171,6 @@ def tsp(adj: array, size: int):
     # find min of each column
     arr_min = np.min(adj, axis=0)
     arr_min = arr_min.tolist()
-    do_kruskal = False
-
     min_adj = [[maxsize for x in range(size)] for y in range(size)]
     # matrix with minimum cost
     for i in range(0, size):
@@ -196,13 +193,11 @@ def tsp(adj: array, size: int):
     stack.append((0, 0))
     lb = 0
     weight = []
-    path = []
     doErase = False
 
     while len(stack) > 0:
         # print("1", stack)
         (v, l) = stack.pop()
-        # print("pop ", v, l, doErase)
         if v != 0:
 
             if len(weight) != 0 and doErase:
@@ -215,7 +210,6 @@ def tsp(adj: array, size: int):
                 else:
                     prev = 0
                 visited = [False] * size
-                # print("lll", weight)
                 for (i, j, k) in weight:
                     visited[j] = True
                     visited[k] = True
@@ -228,53 +222,41 @@ def tsp(adj: array, size: int):
             for k in range(0, len(weight)):
                 lb += weight[k][0]
             weight.append((adj[prev][v], prev, v))
-            # print("weights", weight)
 
         edges[prev][v] = True
         prev = v
         prevLevel = l
         if not visited[v]:
             visited[v] = True
-            # print("v ", v)
             leaf = True
             for j in range(0, size):
                 if not visited[j]:
                     leaf = False
-                    # print("i ", j)
-                    # TODO tutaj chyba mamy wracać do 0 itp.
                     if lb <= upperbound:  # else prune
                         stack.append((j, l + 1))
                     else:
-                        # print("prune ", j)
                         doErase = True
             if leaf:
-                # if do_kruskal:
-                #     newLb = lb
-                # else:
-                #     newLb = lb + adj[v][0]
-
                 newLb = 0
                 for (a, b, c) in weight:
                     newLb += a
                 newLb += adj[weight[-1][2]][0]
 
-                # TODO to chyba nie tu..
                 if newLb < upperbound:
                     upperbound = newLb
                     path = [k for (i, j, k) in weight]
                     path.insert(0, 0)
                     path.append(0)
-                    # print("path ", path)
 
                 doErase = True
-                # print("Leaf ", v)
-    print(path)
     return {'value': upperbound,
             'path': path}
 
 
+do_kruskal = False
+
 if __name__ == "__main__":
-    size = 5  # number of graph vertices
+    size = 7  # number of graph vertices
     # starting point is indicated by rows and destination by cols
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
     mat = generate_graph(size)
@@ -286,24 +268,3 @@ if __name__ == "__main__":
     print('NEAREST NEIGHBOURS\t', nn)
     tsp = tsp(mat, size)
     print('B&B\t', tsp)
-
-    # mat2 = [[maxsize, 7, 8, maxsize, maxsize, maxsize],
-    #         [7, maxsize, 3, 6, maxsize, 5],
-    #         [8, 3, maxsize, 4, maxsize, 3],
-    #         [maxsize, 6, 4, maxsize, 5, 2],
-    #         [maxsize, maxsize, maxsize, 5, maxsize, 2],
-    #         [maxsize, 5, 3, 2, 2, maxsize]]
-    # mat2 = [[maxsize, 2, maxsize, 6, maxsize],
-    #         [2, maxsize, 3, 8, 5],
-    #         [maxsize, 3, maxsize, maxsize, 7],
-    #         [6, 8, maxsize, maxsize, 9],
-    #         [maxsize, 5, 7, 9, maxsize]]
-    #
-    # k = kruskal(mat2, 5)
-    # print(k)
-    # mat2 = [[maxsize, 5, 5],
-    #         [5, maxsize, 10],
-    #         [5, 10, maxsize]]
-    #
-    # k = kruskal(mat2, 3)
-    # print(k)
