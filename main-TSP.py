@@ -166,7 +166,7 @@ def lowerbound_k(matrix: array, node: int, size: int, edges: array):
 def tsp(adj: array, size: int):
     # set upper bound -- initial best tour cost
     upperbound = greedy(adj, 0)
-    path = [i for i in upperbound['path']]
+    path = upperbound['path']
     upperbound = upperbound['value']
     # find min of each column
     arr_min = np.min(adj, axis=0)
@@ -188,20 +188,20 @@ def tsp(adj: array, size: int):
     # Iterative DFS
     stack = []
     prev = 0
-    prevLevel = 0
+    prev_level = 0
     visited = [False] * size
     stack.append((0, 0))
     lb = 0
     weight = []
-    doErase = False
+    do_erase = False
 
     while len(stack) > 0:
         (v, l) = stack.pop()
         if v != 0:
 
-            if len(weight) != 0 and doErase:
-                doErase = False
-                erase = prevLevel - l + 1
+            if len(weight) != 0 and do_erase:
+                do_erase = False
+                erase = prev_level - l + 1
                 weight = weight[:-erase]
 
                 if len(weight) != 0:
@@ -218,36 +218,41 @@ def tsp(adj: array, size: int):
             else:
                 lb = lowerbound(adj, prev, v, arr_min, visited)
 
+            # add already fixed edges
             for k in range(0, len(weight)):
                 lb += weight[k][0]
             weight.append((adj[prev][v], prev, v))
 
         edges[prev][v] = True
         prev = v
-        prevLevel = l
-        if not visited[v]:
-            visited[v] = True
-            leaf = True
-            for j in range(0, size):
-                if not visited[j]:
-                    leaf = False
-                    if lb <= upperbound:  # else prune
-                        stack.append((j, l + 1))
-                    else:
-                        doErase = True
-            if leaf:
-                newLb = 0
-                for (a, b, c) in weight:
-                    newLb += a
-                newLb += adj[weight[-1][2]][0]
+        prev_level = l
+        if lb > upperbound: # prune
+            do_erase = True
+        else:
+            if not visited[v]:
+                visited[v] = True
+                leaf = True
+                for j in range(0, size):
+                    if not visited[j]:
+                        leaf = False
+                        if lb <= upperbound:  # else prune
+                            stack.append((j, l + 1))
+                        else:
+                            do_erase = True
+                if leaf:
+                    newLb = 0
+                    # calculate real tour cost
+                    for (a, b, c) in weight:
+                        newLb += a
+                    newLb += adj[weight[-1][2]][0]
 
-                if newLb < upperbound:
-                    upperbound = newLb
-                    path = [k for (i, j, k) in weight]
-                    path.insert(0, 0)
-                    path.append(0)
+                    if newLb < upperbound:
+                        upperbound = newLb
+                        path = [k for (i, j, k) in weight]
+                        path.insert(0, 0)
+                        path.append(0)
 
-                doErase = True
+                    do_erase = True
     return {'value': upperbound,
             'path': path}
 
@@ -255,7 +260,7 @@ def tsp(adj: array, size: int):
 do_kruskal = False
 
 if __name__ == "__main__":
-    size = 3  # number of graph vertices
+    size = 15  # number of graph vertices
     # starting point is indicated by rows and destination by cols
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
     mat = generate_graph(size)
@@ -264,14 +269,15 @@ if __name__ == "__main__":
     print('-----------------------------------------------------------')
     nn = greedy(mat, 0)
     print('NEAREST NEIGHBOURS\t', nn)
-
-    do_k = ''
-    for i in range(0, 2):
-        tsp_var = tsp(mat, size)
-        if do_kruskal:
-            do_k = 'Kruskal'
-        print('B&B\t',do_k, tsp_var)
-        do_kruskal = True
+    tsp_var = tsp(mat, size)
+    print('B&B\t', tsp_var)
+    # do_k = ''
+    # for i in range(0, 2):
+    #     tsp_var = tsp(mat, size)
+    #     if do_kruskal:
+    #         do_k = 'Kruskal'
+    #     print('B&B\t',do_k, tsp_var)
+    #     do_kruskal = True
 
 
 
