@@ -196,7 +196,6 @@ def tsp(adj: array, size: int):
     doErase = False
 
     while len(stack) > 0:
-        # print("1", stack)
         (v, l) = stack.pop()
         if v != 0:
 
@@ -256,7 +255,7 @@ def tsp(adj: array, size: int):
 do_kruskal = False
 
 if __name__ == "__main__":
-    size = 7  # number of graph vertices
+    size = 3  # number of graph vertices
     # starting point is indicated by rows and destination by cols
     # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
     mat = generate_graph(size)
@@ -264,7 +263,15 @@ if __name__ == "__main__":
     print('\t\t\t\t\tTSP')
     print('-----------------------------------------------------------')
     nn = greedy(mat, 0)
-    print(mat)
     print('NEAREST NEIGHBOURS\t', nn)
-    tsp = tsp(mat, size)
-    print('B&B\t', tsp)
+
+    do_k = ''
+    for i in range(0, 2):
+        tsp_var = tsp(mat, size)
+        if do_kruskal:
+            do_k = 'Kruskal'
+        print('B&B\t',do_k, tsp_var)
+        do_kruskal = True
+
+
+
