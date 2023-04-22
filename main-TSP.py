@@ -80,13 +80,14 @@ def lowerbound(matrix: array, i: int, j: int, arr_min: array, visited: array):
     return sum + lb
 
 
-# Check if there are cycles
+# Check if two vertices are not in the same set
+# else they will form a cycle
 def find(i: int, parent: array):
     while parent[i] != i:
         i = parent[i]
     return i
 
-
+# Connect two vertices with an edge
 def union(i: int, j: int, parent: array):
     a = find(i, parent)
     b = find(j, parent)
@@ -97,6 +98,7 @@ def kruskal(matrix: array, size: int, edges: array = []):
     # Kruskal's Algorithm
     mincost = 0
     path = []
+    # all vertices in disjoint sets
     parent = [i for i in range(size)]
 
     # no of edges is v - 1
@@ -109,7 +111,6 @@ def kruskal(matrix: array, size: int, edges: array = []):
                     union(i, j, parent)
                     path.append(i)
                     path.append(j)
-                    #mincost += matrix[i][j]
     # assign unassigned edges
     for i in range(0, curr_size):
         min = maxsize
@@ -119,7 +120,6 @@ def kruskal(matrix: array, size: int, edges: array = []):
             for k in range(0, size):
                 if find(j, parent) != find(k, parent) and matrix[j][k] < min:
                     min = matrix[j][k]
-                    # print(min)
                     a = j
                     b = k
         union(a, b, parent)
@@ -163,12 +163,8 @@ def lowerbound_k(matrix: array, node: int, size: int, edges: array):
     # Delete a vertex then find a minimum spanning tree
     reduced = reduce(matrix, node)
     reduced_edges = reduce(edges, node)
-    # print(reduced)
-    # print(reduced_edges)
     lb = kruskal(reduced, size - 1, reduced_edges)
-    # print('kruskal', lb)
     least_edges = least_cost_edges(matrix, node)
-    # print('least_edges', least_edges)
     lb = lb['mincost'] + least_edges['min1'] + least_edges['min2']
 
     return lb
@@ -190,10 +186,8 @@ def tsp(adj: array, size: int):
                 min_adj[i][j] = adj[j][i]
             else:
                 min_adj[i][j] = adj[i][j]
-    # print(min_adj)
 
     edges = [[False for x in range(size)] for y in range(size)]
-
     for i in range(0, size):
         edges[i][i] = True
 
@@ -224,14 +218,10 @@ def tsp(adj: array, size: int):
                 for (i, j, k) in weight:
                     visited[j] = True
                     visited[k] = True
-            # print('v', v)
-            # print('prev', prev)
             edges[prev][v] = True
             edges[v][prev] = True
-            # print(edges)
             if do_kruskal:
                 lb = lowerbound_k(min_adj, v, size, edges)
-                # print('lb', lb)
             else:
                 lb = lowerbound(adj, prev, v, arr_min, visited)
 
