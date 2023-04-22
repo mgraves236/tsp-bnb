@@ -267,18 +267,27 @@ do_kruskal = False
 
 if __name__ == "__main__":
 
+    f = open("tests.txt", "w")
     # initialize variables for tests
     time_arr = []
     time_arr_k = []
 
     for j in range(0, 2):
         n_arr = []
+        if do_kruskal:
+            f = open("tests.txt", "a")
+            f.write('\nKRUSKAL\n')
+            f.close()
+            print('KRUSKAL')
 
-        for n in range(3, 10):
+        for n in range(3, 15):
             seed = 554656 * n
             time_sum = 0
             # number of repetitions
-            for i in range(0, 5):
+            rep = 10
+            if n > 10:
+                rep = 3
+            for i in range(0, rep):
                 start_time = time.time()
 
                 size = n  # number of graph vertices
@@ -307,15 +316,29 @@ if __name__ == "__main__":
                 #     print('B&B\t', do_k, tsp_var)
                 #     do_kruskal = True
             n_arr.append(n)
+            print(n,' ', end='')
+            f = open("tests.txt", "a")
+            f.write(str(n) + ' ')
+            f.close()
+
             if do_kruskal:
-                time_arr_k.append(time_sum / n)
+                time_arr_k.append(time_sum / rep)
+                print(time_arr_k[-1])
+                f = open("tests.txt", "a")
+                f.write(str(time_arr_k[-1]) + '\n')
+                f.close()
+
                 # time_arr_k = [x / 60 for x in time_arr_k]
             else:
-                time_arr.append(time_sum / n)
+                time_arr.append(time_sum / rep)
+                print(time_arr[-1])
+                f = open("tests.txt", "a")
+                f.write(str(time_arr[-1]) + '\n')
+
                 # time_arr = [x / 60 for x in time_arr]
 
         do_kruskal = True
-
+    f.close()
     plt.title("Time vs. Sample size")
     plt.xlabel("n")
     plt.ylabel("time [s]")
