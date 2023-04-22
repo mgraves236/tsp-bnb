@@ -2,15 +2,15 @@
 # Branch and Bound
 import array
 from sys import maxsize
+import time
 import numpy as np
+from matplotlib import pyplot as plt
 
 import RandomNumberGenerator
 
-random = RandomNumberGenerator.RandomNumberGenerator(5546568)
-
 
 # Function to generate adjacent matrix for the graph
-def generate_graph(size: int):
+def generate_graph(size: int, random: RandomNumberGenerator):
     matrix = [[0 for x in range(size)] for y in range(size)]
     for i in range(0, size):
         for j in range(0, size):
@@ -22,7 +22,7 @@ def generate_graph(size: int):
 
 
 # Function to generate symmetric adjacent matrix for the graph
-def generate_graph_sym(size: int):
+def generate_graph_sym(size: int, random: RandomNumberGenerator):
     matrix = [[0 for x in range(size)] for y in range(size)]
     for i in range(0, size):
         for j in range(i, size):
@@ -266,25 +266,62 @@ def tsp(adj: array, size: int):
 do_kruskal = False
 
 if __name__ == "__main__":
-    size = 4  # number of graph vertices
-    # starting point is indicated by rows and destination by cols
-    # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
-    mat = generate_graph_sym(size)
-    print(mat)
-    print('-----------------------------------------------------------')
-    print('\t\t\t\t\tTSP')
-    print('-----------------------------------------------------------')
-    nn = greedy(mat, 0)
-    print('NEAREST NEIGHBOURS\t', nn)
-    # tsp_var = tsp(mat, size)
-    # print('B&B\t', tsp_var)
-    do_k = ''
-    for i in range(0, 2):
-        tsp_var = tsp(mat, size)
-        if do_kruskal:
-            do_k = 'Kruskal'
-        print('B&B\t', do_k, tsp_var)
+
+    # initialize variables for tests
+    time_arr = []
+    time_arr_k = []
+
+    for j in range(0, 2):
+        n_arr = []
+
+        for n in range(3, 10):
+            seed = 554656 * n
+            time_sum = 0
+            # number of repetitions
+            for i in range(0, 5):
+                start_time = time.time()
+
+                size = n  # number of graph vertices
+                # starting point is indicated by rows and destination by cols
+                # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
+                random = RandomNumberGenerator.RandomNumberGenerator(seed * i)
+                mat = generate_graph(size, random)
+                tsp(mat, size)
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                time_sum += elapsed_time
+                # print(mat)
+                # print('-----------------------------------------------------------')
+                # print('\t\t\t\t\tTSP')
+                # print('-----------------------------------------------------------')
+                # print('size: ', n)
+                # nn = greedy(mat, 0)
+                # print('NEAREST NEIGHBOURS\t', nn)
+                # tsp_var = tsp(mat, size)
+                # print('B&B\t', tsp_var)
+                # do_k = ''
+                # for i in range(0, 2):
+                #     tsp_var = tsp(mat, size)
+                #     if do_kruskal:
+                #         do_k = 'Kruskal'
+                #     print('B&B\t', do_k, tsp_var)
+                #     do_kruskal = True
+            n_arr.append(n)
+            if do_kruskal:
+                time_arr_k.append(time_sum / n)
+                # time_arr_k = [x / 60 for x in time_arr_k]
+            else:
+                time_arr.append(time_sum / n)
+                # time_arr = [x / 60 for x in time_arr]
+
         do_kruskal = True
 
+    plt.title("Time vs. Sample size")
+    plt.xlabel("n")
+    plt.ylabel("time [s]")
+    plt.plot(n_arr, time_arr, label="Min Lowerbound")
+    plt.plot(n_arr, time_arr_k, label="Kruskal Lowerbound")
+    plt.legend()
+    plt.show()
 
 
