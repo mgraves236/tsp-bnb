@@ -267,7 +267,8 @@ do_kruskal = False
 
 if __name__ == "__main__":
 
-    f = open("tests.txt", "w")
+    # f = open("tests.txt", "w")
+    # fk = open("tests_kruskal.txt", "w")
     # initialize variables for tests
     time_arr = []
     time_arr_k = []
@@ -275,18 +276,15 @@ if __name__ == "__main__":
     for j in range(0, 2):
         n_arr = []
         if do_kruskal:
-            f = open("tests.txt", "a")
-            f.write('\nKRUSKAL\n')
-            f.close()
             print('KRUSKAL')
 
-        for n in range(3, 15):
+        for n in range(3, 10):
             seed = 554656 * n
             time_sum = 0
             # number of repetitions
-            rep = 10
+            rep = 100
             if n > 10:
-                rep = 3
+                rep = 5
             for i in range(0, rep):
                 start_time = time.time()
 
@@ -316,29 +314,36 @@ if __name__ == "__main__":
                 #     print('B&B\t', do_k, tsp_var)
                 #     do_kruskal = True
             n_arr.append(n)
-            print(n,' ', end='')
-            f = open("tests.txt", "a")
-            f.write(str(n) + ' ')
-            f.close()
+            print(n, ' ', end='')
+            # if do_kruskal:
+            #     fk = open("tests_kruskal.txt", "a")
+            #     fk.write(str(n) + ' ')
+            #     fk.close()
+            # else:
+            #     f = open("tests.txt", "a")
+            #     f.write(str(n) + ' ')
+            #     f.close()
 
             if do_kruskal:
                 time_arr_k.append(time_sum / rep)
                 print(time_arr_k[-1])
-                f = open("tests.txt", "a")
-                f.write(str(time_arr_k[-1]) + '\n')
-                f.close()
+                # fk = open("tests_kruskal.txt", "a")
+                # fk.write(str(time_arr_k[-1]) + '\n')
+                # fk.close()
 
                 # time_arr_k = [x / 60 for x in time_arr_k]
             else:
                 time_arr.append(time_sum / rep)
                 print(time_arr[-1])
-                f = open("tests.txt", "a")
-                f.write(str(time_arr[-1]) + '\n')
+                # f = open("tests.txt", "a")
+                # f.write(str(time_arr[-1]) + '\n')
+                # f.close()
 
                 # time_arr = [x / 60 for x in time_arr]
 
         do_kruskal = True
-    f.close()
+    # f.close()
+    # fk.close()
     plt.title("Time vs. Sample size")
     plt.xlabel("n")
     plt.ylabel("time [s]")
