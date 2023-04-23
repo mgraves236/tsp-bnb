@@ -394,4 +394,4 @@ if __name__ == "__main__":
     print('\t\t\t\t\tMEAN ERROR')
     print('-----------------------------------------------------------')
     print('Min: ', mean_error, '%')
-    print('Kriskal: ', mean_error_k, '%')
+    print('Kruskal: ', mean_error_k, '%')
