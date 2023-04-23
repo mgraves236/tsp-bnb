@@ -36,7 +36,7 @@ def generate_graph_sym(size: int, random: RandomNumberGenerator):
     return matrix
 
 
-def greedy(matrix: array, start: int):
+def greedy(matrix: array, start: int, size: int):
     # Nearest Neighbour Algorithm
     min_tour = 0
     path = [start]
@@ -66,7 +66,7 @@ def greedy(matrix: array, start: int):
             'path': path}
 
 
-def lowerbound(matrix: array, i: int, j: int, arr_min: array, visited: array):
+def lowerbound(matrix: array, i: int, j: int, arr_min: array, visited: array, size: int):
     lb = matrix[i][j]
     visited[0] = False
     visited[j] = True
@@ -86,6 +86,7 @@ def find(i: int, parent: array):
     while parent[i] != i:
         i = parent[i]
     return i
+
 
 # Connect two vertices with an edge
 def union(i: int, j: int, parent: array):
@@ -131,7 +132,7 @@ def kruskal(matrix: array, size: int, edges: array = []):
             'path': path}
 
 
-def least_cost_edges(matrix: array, i: int):
+def least_cost_edges(matrix: array, i: int, size: int):
     # print('least_cost', matrix)
     least_cost = {'min1': maxsize, 'min2': maxsize}
     for j in range(0, size):
@@ -164,7 +165,7 @@ def lowerbound_k(matrix: array, node: int, size: int, edges: array):
     reduced = reduce(matrix, node)
     reduced_edges = reduce(edges, node)
     lb = kruskal(reduced, size - 1, reduced_edges)
-    least_edges = least_cost_edges(matrix, node)
+    least_edges = least_cost_edges(matrix, node, size)
     lb = lb['mincost'] + least_edges['min1'] + least_edges['min2']
 
     return lb
@@ -172,7 +173,7 @@ def lowerbound_k(matrix: array, node: int, size: int, edges: array):
 
 def tsp(adj: array, size: int):
     # set upper bound -- initial best tour cost
-    upperbound = greedy(adj, 0)
+    upperbound = greedy(adj, 0, size)
     path = upperbound['path']
     upperbound = upperbound['value']
     # find min of each column
@@ -223,17 +224,16 @@ def tsp(adj: array, size: int):
             if do_kruskal:
                 lb = lowerbound_k(min_adj, v, size, edges)
             else:
-                lb = lowerbound(adj, prev, v, arr_min, visited)
+                lb = lowerbound(adj, prev, v, arr_min, visited, size)
 
             # add already fixed edges
             for k in range(0, len(weight)):
                 lb += weight[k][0]
             weight.append((adj[prev][v], prev, v))
 
-
         prev = v
         prev_level = l
-        if lb > upperbound: # prune
+        if lb > upperbound:  # prune
             do_erase = True
         else:
             if not visited[v]:
@@ -241,7 +241,6 @@ def tsp(adj: array, size: int):
                 leaf = True
                 for j in range(0, size):
                     if not visited[j]:
-
                         leaf = False
                         stack.append((j, l + 1))
 
@@ -266,90 +265,133 @@ def tsp(adj: array, size: int):
 do_kruskal = False
 
 if __name__ == "__main__":
-
     # f = open("tests.txt", "w")
     # fk = open("tests_kruskal.txt", "w")
     # initialize variables for tests
-    time_arr = []
-    time_arr_k = []
+    # time_arr = []
+    # time_arr_k = []
+    #
+    # for j in range(0, 2):
+    #     n_arr = []
+    #     if do_kruskal:
+    #         print('KRUSKAL')
+    #
+    #     for n in range(3, 10):
+    #         seed = 554656 * n
+    #         time_sum = 0
+    #         # number of repetitions
+    #         rep = 100
+    #         if n > 10:
+    #             rep = 5
+    #         for i in range(0, rep):
+    #             start_time = time.time()
+    #
+    #             size = n  # number of graph vertices
+    #             # starting point is indicated by rows and destination by cols
+    #             # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
+    #             random = RandomNumberGenerator.RandomNumberGenerator(seed * i)
+    #             mat = generate_graph(size, random)
+    #             tsp(mat, size)
+    #             end_time = time.time()
+    #             elapsed_time = end_time - start_time
+    #             time_sum += elapsed_time
+    #         n_arr.append(n)
+    #         print(n, ' ', end='')
+    #         # if do_kruskal:
+    #         #     fk = open("tests_kruskal.txt", "a")
+    #         #     fk.write(str(n) + ' ')
+    #         #     fk.close()
+    #         # else:
+    #         #     f = open("tests.txt", "a")
+    #         #     f.write(str(n) + ' ')
+    #         #     f.close()
+    #
+    #         if do_kruskal:
+    #             time_arr_k.append(time_sum / rep)
+    #             print(time_arr_k[-1])
+    #             # fk = open("tests_kruskal.txt", "a")
+    #             # fk.write(str(time_arr_k[-1]) + '\n')
+    #             # fk.close()
+    #
+    #             # time_arr_k = [x / 60 for x in time_arr_k]
+    #         else:
+    #             time_arr.append(time_sum / rep)
+    #             print(time_arr[-1])
+    #             # f = open("tests.txt", "a")
+    #             # f.write(str(time_arr[-1]) + '\n')
+    #             # f.close()
+    #
+    #             # time_arr = [x / 60 for x in time_arr]
+    #
+    #     do_kruskal = True
+    # # f.close()
+    # # fk.close()
+    # plt.title("Time vs. Sample size")
+    # plt.xlabel("n")
+    # plt.ylabel("time [s]")
+    # plt.plot(n_arr, time_arr, label="Min Lowerbound")
+    # plt.plot(n_arr, time_arr_k, label="Kruskal Lowerbound")
+    # plt.legend()
+    # plt.show()
 
-    for j in range(0, 2):
-        n_arr = []
-        if do_kruskal:
-            print('KRUSKAL')
+    # starting point is indicated by rows and destination by cols
+    # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
+    # mat = generate_graph(size, random)
+    mat1 = [[maxsize, 12, 10, 19, 8],
+            [12, maxsize, 3, 7, 2],
+            [10, 3, maxsize, 6, 20],
+            [19, 7, 6, maxsize, 4],
+            [8, 2, 20, 4, maxsize]]
 
-        for n in range(3, 10):
-            seed = 554656 * n
-            time_sum = 0
-            # number of repetitions
-            rep = 100
-            if n > 10:
-                rep = 5
-            for i in range(0, rep):
-                start_time = time.time()
+    mat2 = [[maxsize, 14, 15, 13, 9],
+            [14, maxsize, 18, 5, 13],
+            [15, 18, maxsize, 19, 10],
+            [13, 5, 19, maxsize, 12],
+            [9, 13, 10, 12, maxsize]]
 
-                size = n  # number of graph vertices
-                # starting point is indicated by rows and destination by cols
-                # i.e. travelling from node 0 to 1 is indicated by mat[0][1]
-                random = RandomNumberGenerator.RandomNumberGenerator(seed * i)
-                mat = generate_graph(size, random)
-                tsp(mat, size)
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                time_sum += elapsed_time
-                # print(mat)
-                # print('-----------------------------------------------------------')
-                # print('\t\t\t\t\tTSP')
-                # print('-----------------------------------------------------------')
-                # print('size: ', n)
-                # nn = greedy(mat, 0)
-                # print('NEAREST NEIGHBOURS\t', nn)
-                # tsp_var = tsp(mat, size)
-                # print('B&B\t', tsp_var)
-                # do_k = ''
-                # for i in range(0, 2):
-                #     tsp_var = tsp(mat, size)
-                #     if do_kruskal:
-                #         do_k = 'Kruskal'
-                #     print('B&B\t', do_k, tsp_var)
-                #     do_kruskal = True
-            n_arr.append(n)
-            print(n, ' ', end='')
-            # if do_kruskal:
-            #     fk = open("tests_kruskal.txt", "a")
-            #     fk.write(str(n) + ' ')
-            #     fk.close()
-            # else:
-            #     f = open("tests.txt", "a")
-            #     f.write(str(n) + ' ')
-            #     f.close()
+    mat3 = [[maxsize, 12, 29, 22, 13, 24],
+            [12, maxsize, 19, 3, 25, 6],
+            [29, 19, maxsize, 21, 23, 28],
+            [22, 3, 21, maxsize, 4, 5],
+            [13, 25, 23, 4, maxsize, 16],
+            [24, 6, 28, 5, 16, maxsize]]
 
+    mat4 = [[maxsize, 12, 14, 17],
+            [12, maxsize, 15, 18],
+            [15, 15, maxsize, 29],
+            [17, 18, 29, maxsize]]
+
+    matrices = [(5, mat1, 32), (5, mat2, 46), (6, mat3, 76), (4, mat4, 64)]
+    print('---------------------------------------------------------------------------------')
+    print('\t\t\t\t\t\t\t\t\tTSP')
+    print('---------------------------------------------------------------------------------')
+    # print('size: ', n)
+    # nn = greedy(mat, 0)
+    # print('NEAREST NEIGHBOURS\t', nn)
+    # tsp_var = tsp(mat, size)
+    # print('B&B\t', tsp_var)
+    acc = []
+    acc_k = []
+    for j in range(0, len(matrices)):
+        do_k = ''
+        do_kruskal = False
+        for i in range(0, 2):
+            tsp_var = tsp(matrices[j][1], matrices[j][0])
             if do_kruskal:
-                time_arr_k.append(time_sum / rep)
-                print(time_arr_k[-1])
-                # fk = open("tests_kruskal.txt", "a")
-                # fk.write(str(time_arr_k[-1]) + '\n')
-                # fk.close()
-
-                # time_arr_k = [x / 60 for x in time_arr_k]
+                do_k = 'Kruskal'
+                acc_k.append((tsp_var['value'] - matrices[j][2]) / matrices[j][2])
             else:
-                time_arr.append(time_sum / rep)
-                print(time_arr[-1])
-                # f = open("tests.txt", "a")
-                # f.write(str(time_arr[-1]) + '\n')
-                # f.close()
+                do_k = ''
+                acc.append((tsp_var['value'] - matrices[j][2]) / matrices[j][2])
+            print('B&B\t', do_k, tsp_var, end='')
+            print(' Optimal: ', matrices[j][2])
+            do_kruskal = True
+        print('\n')
 
-                # time_arr = [x / 60 for x in time_arr]
-
-        do_kruskal = True
-    # f.close()
-    # fk.close()
-    plt.title("Time vs. Sample size")
-    plt.xlabel("n")
-    plt.ylabel("time [s]")
-    plt.plot(n_arr, time_arr, label="Min Lowerbound")
-    plt.plot(n_arr, time_arr_k, label="Kruskal Lowerbound")
-    plt.legend()
-    plt.show()
-
-
+    mean_error = sum(acc) / len(acc) * 100
+    mean_error_k = sum(acc_k) / len(acc_k) * 100
+    print('-----------------------------------------------------------')
+    print('\t\t\t\t\tMEAN ERROR')
+    print('-----------------------------------------------------------')
+    print('Min: ', mean_error, '%')
+    print('Kriskal: ', mean_error_k, '%')
